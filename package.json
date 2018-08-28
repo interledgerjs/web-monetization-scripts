@@ -1,0 +1,31 @@
+{
+  "name": "web-monetization-scripts",
+  "version": "1.0.0",
+  "description": "Scripts for web monetization",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/interledgerjs/web-monetization-scripts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/interledgerjs/web-monetization-scripts/issues"
+  },
+  "homepage": "https://github.com/interledgerjs/web-monetization-scripts#readme",
+  "dependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-loader": "^8.0.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "fs-extra": "^7.0.0",
+    "webpack": "^4.17.1",
+    "webpack-bundle-analyzer": "^2.13.1",
+    "webpack-command": "^0.4.1",
+    "webpack-dev-server": "^3.1.6"
+  }
+}
