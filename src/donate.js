@@ -13,39 +13,40 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   const iconEl = document.createElement('img')
   const sumEl = document.createElement('span')
 
-  const activeIconSrc = '' // TODO
-  const inactiveIconSrc = '' // TODO
+  const activeIconSrc = '/res/active.gif' // TODO
+  const inactiveIconSrc = '/res/inactive.png' // TODO
 
   widget.style.position = 'fixed'
   widget.style.bottom = '35px'
   widget.style.left = '-27px'
   widget.style.right = '30px'
-  widget.style.width = '190px'
-  widget.style.height = '30px'
+  widget.style.width = '150px'
+  widget.style.height = '38px'
   widget.style.overflow = 'hidden'
   widget.style.color = '#fff'
   widget.style.backgroundColor = 'rgba(22,31,38,0.6)'
   widget.style.zIndex = 10000
   widget.style.borderRadius = '5px'
-  widget.style.padding = '1px 10px 4px 30px'
+  widget.style.padding = '1px 10px 1px 30px'
   widget.style.boxShadow = '0px 0px 42px -11px rgba(0,0,0,1)'
   widget.style.fontFamily = 'Arial, sans-serif'
   widget.style.fontSize = '15px'
   widget.style.lineHeight = '28px'
   iconEl.style.padding = 'none'
   iconEl.style.margin = 'none'
-  iconEl.style.display = 'inline-block'
+  iconEl.style.display = 'block'
+  iconEl.style.float = 'left'
   iconEl.style.marginLeft = '2px'
-  iconEl.style.marginTop = '-2px'
   iconEl.style.marginRight = '1px'
-  iconEl.style.height = '100%'
+  iconEl.style.height = '32px'
   iconEl.style.width = '32px'
-  sumEl.style.position = 'absolute'
-  sumEl.style.width = '128px'
+  iconEl.style.paddingTop = '3px'
+  sumEl.style.float = 'right'
   sumEl.style.height = '100%'
   sumEl.style.overflow = 'hidden'
-  sumEl.style.display = 'inline-block'
-  sumEl.style.textAlign = 'center'
+  sumEl.style.display = 'block'
+  sumEl.style.textAlign = 'right'
+  sumEl.style.paddingTop = '6px'
 
   iconEl.src = inactiveIconSrc
   sumEl.innerText = String(sum) + ' nXRP'
@@ -54,11 +55,16 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
 
   let sum = 0
   let widgetAdded = false
+  let active = false
   donation.addEventListener('money', ev => {
     // TODO: use ILDCP to display currency
     sum += Number(ev.detail.amount)
     sumEl.innerText = String(sum) + ' nXRP'
-    iconEl.src = activeIconSrc
+
+    if (!active) {
+      active = true
+      iconEl.src = activeIconSrc
+    }
 
     // If the window is loaded and money has been sent we'll display the widget
     if (!widgetAdded && [
@@ -72,7 +78,10 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   })
 
   donation.addEventListener('close', () => {
-    iconEl.src = inactiveIconSrc
+    if (active) {
+      active = false
+      iconEl.src = inactiveIconSrc
+    }
   })
 }
 
@@ -148,15 +157,15 @@ window.WebMonetizationScripts.donate = async function ({
 
     // Create the actual connection over Interledger.
     const spspJsonResponse = await spspQuery.json()
-    ret.connection = await window.WebMonetization.monetize({
+    const connection = ret.connection = await window.WebMonetization.monetize({
       destinationAccount: spspJsonResponse.destination_account,
       sharedSecret: spspJsonResponse.shared_secret
     })
 
     // Create a conceptual 'stream' of money on our Interledger connection and
     // begin sending at the maximum throughput we're allowed
-    ret.stream = ret.connection.createStream()
-    ret.stream.setSendMax('9999999999999')
+    const stream = ret.stream = connection.createStream()
+    stream.setSendMax('9999999999999')
 
     // Emit events when money is sent so that the page can trigger logic or UI
     // changes elsewhere in the page.
@@ -168,7 +177,7 @@ window.WebMonetizationScripts.donate = async function ({
       }))
     }
 
-    ret.stream.addEventListener('outgoing_money', onOutgoingMoney)
+    stream.addEventListener('outgoing_money', onOutgoingMoney)
 
     // Wait while the stream sends and exit (thus triggering a retry) should
     // the connection close.
@@ -184,18 +193,17 @@ window.WebMonetizationScripts.donate = async function ({
         if (document.hidden) {
           reject(new Error('page has been hidden.'))
           cleanUp()
-          ret.connection.close()
         }
       }
 
       function cleanUp () {
-        ret.connection.removeEventListener('close', onClose)
-        ret.stream.removeEventListener('outgoing_money', onOutgoingMoney)
+        connection.removeEventListener('close', onClose)
+        stream.removeEventListener('outgoing_money', onOutgoingMoney)
         document.removeEventListener('visibilitychange', onHide)
         ret.dispatchEvent(new CustomEvent('close'))
       }
 
-      ret.connection.addEventListener('close', onClose)
+      connection.addEventListener('close', onClose)
       document.addEventListener('visibilitychange', onHide, false)
     })
   }
