@@ -8,7 +8,76 @@ window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
   return parsed.origin + (parsed.pathname || '/.well-known/pay')
 }
 
+window.WebMonetizationScripts.createDonateWidget = function (donation) {
+  const widget = document.createElement('div')
+  const iconEl = document.createElement('img')
+  const sumEl = document.createElement('span')
+
+  const activeIconSrc = '' // TODO
+  const inactiveIconSrc = '' // TODO
+
+  widget.style.position = 'fixed'
+  widget.style.bottom = '35px'
+  widget.style.left = '-27px'
+  widget.style.right = '30px'
+  widget.style.width = '190px'
+  widget.style.height = '30px'
+  widget.style.overflow = 'hidden'
+  widget.style.color = '#fff'
+  widget.style.backgroundColor = 'rgba(22,31,38,0.6)'
+  widget.style.zIndex = 10000
+  widget.style.borderRadius = '5px'
+  widget.style.padding = '1px 10px 4px 30px'
+  widget.style.boxShadow = '0px 0px 42px -11px rgba(0,0,0,1)'
+  widget.style.fontFamily = 'Arial, sans-serif'
+  widget.style.fontSize = '15px'
+  widget.style.lineHeight = '28px'
+  iconEl.style.padding = 'none'
+  iconEl.style.margin = 'none'
+  iconEl.style.display = 'inline-block'
+  iconEl.style.marginLeft = '2px'
+  iconEl.style.marginTop = '-2px'
+  iconEl.style.marginRight = '1px'
+  iconEl.style.height = '100%'
+  iconEl.style.width = '32px'
+  sumEl.style.position = 'absolute'
+  sumEl.style.width = '128px'
+  sumEl.style.height = '100%'
+  sumEl.style.overflow = 'hidden'
+  sumEl.style.display = 'inline-block'
+  sumEl.style.textAlign = 'center'
+
+  iconEl.src = inactiveIconSrc
+  sumEl.innerText = String(sum) + ' nXRP'
+  widget.appendChild(iconEl)
+  widget.appendChild(sumEl)
+
+  let sum = 0
+  let widgetAdded = false
+  donation.addEventListener('money', ev => {
+    // TODO: use ILDCP to display currency
+    sum += Number(ev.detail.amount)
+    sumEl.innerText = String(sum) + ' nXRP'
+    iconEl.src = activeIconSrc
+
+    // If the window is loaded and money has been sent we'll display the widget
+    if (!widgetAdded && [
+      'loaded',
+      'interactive',
+      'complete'
+    ].includes(document.readyState)) {
+      widgetAdded = true
+      document.body.appendChild(widget)
+    }
+  })
+
+  donation.addEventListener('close', () => {
+    iconEl.src = inactiveIconSrc
+  })
+}
+
 // window.WebMonetizationScripts.donate
+//
 // Simple SPSP-based donation script that passively monetizes a webpage.
 //
 //   - paymentPointer: String. SPSP identifier that receives money, e.g.
@@ -16,7 +85,14 @@ window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
 // 
 //   - noRetry: Boolean. Whether or not to retry infinitely.
 //
-window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry }) {
+//   - noWidget: Boolean. Whether or not to show coil widget in bottom-left of
+//   page.
+//
+window.WebMonetizationScripts.donate = async function ({
+  paymentPointer,
+  noRetry,
+  noWidget
+}) {
   function wmError (msg) {
     throw new Error(msg + ' make sure you include the polyfill from https://polyfill.webmonetization.org/polyfill.js and include it before this script.')
   }
@@ -36,7 +112,7 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
   // TODO: cross-platform way to do this
   const ret = new EventTarget()
 
-  function initConnection () {
+  async function initConnection () {
     // Don't do anything if the page is hidden because web monetization won't
     // work. just wait.
     if (document.hidden) {
@@ -44,11 +120,11 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
         function onVisible () {
           if (!document.hidden) {
             resolve()
-            document.removeEventListener('visibilityChange', onVisible)
+            document.removeEventListener('visibilitychange', onVisible)
           }
         }
 
-        document.addEventListener('visibilityChange', onVisible, false)
+        document.addEventListener('visibilitychange', onVisible, false)
       })
     }
 
@@ -84,11 +160,15 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
 
     // Emit events when money is sent so that the page can trigger logic or UI
     // changes elsewhere in the page.
-    function onOutgoingMoney (amount) {
-      ret.dispatchEvent(new CustomEvent('money', amount))
+    function onOutgoingMoney (ev) {
+      ret.dispatchEvent(new CustomEvent('money', {
+        detail: {
+          amount: ev.amount
+        }
+      }))
     }
 
-    ret.stream.addEventListener(onOutgoingMoney)
+    ret.stream.addEventListener('outgoing_money', onOutgoingMoney)
 
     // Wait while the stream sends and exit (thus triggering a retry) should
     // the connection close.
@@ -104,18 +184,19 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
         if (document.hidden) {
           reject(new Error('page has been hidden.'))
           cleanUp()
-          connection.close()
+          ret.connection.close()
         }
       }
 
       function cleanUp () {
-        connection.removeEventListener('close', onClose)
-        stream.removeEventListener('outgoing_money', onOutgoingMoney)
-        document.removeEventListener('visibilityChange', onHide)
+        ret.connection.removeEventListener('close', onClose)
+        ret.stream.removeEventListener('outgoing_money', onOutgoingMoney)
+        document.removeEventListener('visibilitychange', onHide)
+        ret.dispatchEvent(new CustomEvent('close'))
       }
 
-      connection.addEventListener('close', onClose)
-      document.addEventListener('visibilityChange', onHide, false)
+      ret.connection.addEventListener('close', onClose)
+      document.addEventListener('visibilitychange', onHide, false)
     })
   }
 
@@ -132,6 +213,11 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
         return tryConnection()
       }
     }
+  }
+
+  // Create a widget to show donation unless the user disabled it
+  if (!noWidget) {
+    window.WebMonetizationScripts.createDonateWidget(ret)
   }
 
   // Return the connection details (stream, connection, money events) so that
