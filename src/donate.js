@@ -37,6 +37,21 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
   const ret = new EventTarget()
 
   function initConnection () {
+    // Don't do anything if the page is hidden because web monetization won't
+    // work. just wait.
+    if (document.hidden) {
+      await new Promise(resolve => {
+        function onVisible () {
+          if (!document.hidden) {
+            resolve()
+            document.removeEventListener('visibilityChange', onVisible)
+          }
+        }
+
+        document.addEventListener('visibilityChange', onVisible, false)
+      })
+    }
+
     // Convert SPSP payment pointer (e.g. $example.com) to URL (e.g.
     // https://example.com/.well-known/pay)
     const spspReceiver = window.WebMonetizationScripts
@@ -80,11 +95,27 @@ window.WebMonetizationScripts.donate = async function ({ paymentPointer, noRetry
     return new Promise((resolve, reject) => {
       function onClose () {
         reject(new Error('web monetization connection closed.'))
+        cleanUp()
+      }
+
+      // Web monetization doesn't work when the page is hidden, so we'll close
+      // the connection and then wait for it to come back.
+      function onHide () {
+        if (document.hidden) {
+          reject(new Error('page has been hidden.'))
+          cleanUp()
+          connection.close()
+        }
+      }
+
+      function cleanUp () {
         connection.removeEventListener('close', onClose)
         stream.removeEventListener('outgoing_money', onOutgoingMoney)
+        document.removeEventListener('visibilityChange', onHide)
       }
 
       connection.addEventListener('close', onClose)
+      document.addEventListener('visibilityChange', onHide, false)
     })
   }
 
