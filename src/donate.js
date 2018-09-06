@@ -9,63 +9,19 @@ window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
 }
 
 window.WebMonetizationScripts.createDonateWidget = function (donation) {
-  const widget = document.createElement('div')
-  const iconEl = document.createElement('img')
-  const sumEl = document.createElement('span')
+  const widget = document.createElement('svg')
+  widget.innerHTML = `<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="16" r="16" fill="#2D333A"/><path d="M22.1746 20.4186C22.706 20.4186 23.3992 20.6844 23.8845 21.814C23.9538 21.969 24 22.1462 24 22.3012C24 24.1617 19.5866 25.845 17.0218 25.9779C16.837 25.9779 16.629 26 16.4442 26C12.6316 26 9.09628 24.0509 7.27086 20.9059C6.41592 19.4219 6 17.7829 6 16.1218C6 14.1949 6.57766 12.268 7.70988 10.6069C8.58793 9.27796 10.2978 7.52824 13.3017 6.57586C14.0642 6.33223 15.4044 6 16.9294 6C18.4082 6 20.0488 6.31008 21.4814 7.35105C23.4917 8.7907 23.9076 10.3632 23.9076 11.3821C23.9076 11.825 23.8383 12.1573 23.7689 12.3566C23.3068 13.9734 21.7587 15.2137 19.9564 15.4574C19.5404 15.5017 19.1938 15.546 18.8703 15.546C17.2298 15.546 16.6752 14.8815 16.6752 14.1285C16.6752 13.1096 17.6688 11.9136 18.3851 11.9136C18.4775 11.9136 18.57 11.9358 18.6393 11.9801C18.8241 12.0908 19.0552 12.1351 19.2632 12.1351C19.3325 12.1351 19.3787 12.1351 19.448 12.113C20.0257 12.0465 20.3261 11.67 20.3261 11.2049C20.3261 10.3411 19.2632 9.16722 16.9525 9.16722C16.2131 9.16722 15.3582 9.27796 14.3877 9.56589C12.3543 10.1639 11.2221 11.5592 10.6444 12.423C9.8819 13.5305 9.51219 14.8151 9.51219 16.0775C9.51219 17.1628 9.78947 18.2481 10.344 19.2226C11.5456 21.2824 13.9024 22.567 16.4442 22.567C16.5828 22.567 16.6983 22.567 16.837 22.567C20.1412 22.3898 20.9037 20.7951 21.6431 20.4851C21.7587 20.4629 21.9666 20.4186 22.1746 20.4186Z" fill="white"/></svg>`
 
-  const activeIconSrc = '/res/active.gif' // TODO
-  const inactiveIconSrc = '/res/inactive.png' // TODO
-
+  let diff = 10
+  let bottom = -35
   widget.style.position = 'fixed'
-  widget.style.bottom = '35px'
-  widget.style.left = '-27px'
-  widget.style.right = '30px'
-  widget.style.width = '150px'
-  widget.style.height = '38px'
-  widget.style.overflow = 'hidden'
-  widget.style.color = '#fff'
-  widget.style.backgroundColor = 'rgba(22,31,38,0.6)'
+  widget.style.bottom = String(bottom) + 'px'
+  widget.style.left = '13px'
   widget.style.zIndex = 10000
-  widget.style.borderRadius = '5px'
-  widget.style.padding = '1px 10px 1px 30px'
-  widget.style.boxShadow = '0px 0px 42px -11px rgba(0,0,0,1)'
-  widget.style.fontFamily = 'Arial, sans-serif'
-  widget.style.fontSize = '15px'
-  widget.style.lineHeight = '28px'
-  iconEl.style.padding = 'none'
-  iconEl.style.margin = 'none'
-  iconEl.style.display = 'block'
-  iconEl.style.float = 'left'
-  iconEl.style.marginLeft = '2px'
-  iconEl.style.marginRight = '1px'
-  iconEl.style.height = '32px'
-  iconEl.style.width = '32px'
-  iconEl.style.paddingTop = '3px'
-  sumEl.style.float = 'right'
-  sumEl.style.height = '100%'
-  sumEl.style.overflow = 'hidden'
-  sumEl.style.display = 'block'
-  sumEl.style.textAlign = 'right'
-  sumEl.style.paddingTop = '6px'
+  widget.style.transition = 'opacity 2s ease-in'
 
-  iconEl.src = inactiveIconSrc
-  sumEl.innerText = String(sum) + ' nXRP'
-  widget.appendChild(iconEl)
-  widget.appendChild(sumEl)
-
-  let sum = 0
   let widgetAdded = false
-  let active = false
   donation.addEventListener('money', ev => {
-    // TODO: use ILDCP to display currency
-    sum += Number(ev.detail.amount)
-    sumEl.innerText = String(sum) + ' nXRP'
-
-    if (!active) {
-      active = true
-      iconEl.src = activeIconSrc
-    }
-
     // If the window is loaded and money has been sent we'll display the widget
     if (!widgetAdded && [
       'loaded',
@@ -74,13 +30,14 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
     ].includes(document.readyState)) {
       widgetAdded = true
       document.body.appendChild(widget)
-    }
-  })
 
-  donation.addEventListener('close', () => {
-    if (active) {
-      active = false
-      iconEl.src = inactiveIconSrc
+      function animate () {
+        bottom += diff--
+        widget.style.bottom = String(bottom) + 'px'
+        if (bottom < 13) requestAnimationFrame(animate)
+      }
+
+      animate()
     }
   })
 }
