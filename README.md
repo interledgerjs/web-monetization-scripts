@@ -14,8 +14,10 @@ This is useful for Web Monetizing static sites (i.e. replacing advertising). For
 ### Including the Script
 
 ```html
-<script src="https://interledgerjs.github.io/web-monetization-scripts/dist/donate.js"></script>
+<script src="https://cdn.coil.com/donate.js"></script>
 ```
+
+The script also exists at `https://interledgerjs.github.io/web-monetization-scripts/dist/donate.js`, or can be built locally and served from your site.
 
 ### Usage
 
