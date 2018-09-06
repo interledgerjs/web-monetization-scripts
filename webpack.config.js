@@ -3,7 +3,7 @@ const webpack = require('webpack')
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
 
   entry: {
     'donate': ['@babel/polyfill', './src/donate.js']
