@@ -89,7 +89,11 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
         diff = Math.max(diff - 1, 1)
         bottom += diff
         container.style.bottom = String(bottom) + 'px'
-        if (bottom < 13) requestAnimationFrame(animate)
+        if (bottom < 13) {
+          requestAnimationFrame(animate)
+        } else {
+          counter.style.opacity = '1'
+        }
       }
 
       animate()
