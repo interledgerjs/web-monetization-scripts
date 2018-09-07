@@ -23,7 +23,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   counter.appendChild(currencyAmount)
   container.appendChild(counter) 
   currencyCode.innerText = 'XRP '
-  currencyAmount.innerText = '0.000000000'
+  currencyAmount.innerText = '0.000000'
 
   let diff = 10
   let bottom = -40
@@ -70,11 +70,29 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   }
 
   let widgetAdded = false
+  let animating = false
+  let display = 0
   let sum = 0
 
   donation.addEventListener('money', ev => {
     sum += Number(ev.detail.amount)
-    currencyAmount.innerText = (sum / 1e9).toFixed(6)
+
+    if (!animating) {
+      animating = true
+
+      function animateAmount () {
+        display += 4000
+        currencyAmount.innerText = (Math.min(display, sum) / 1e9).toFixed(6)
+
+        if (display >= sum) {
+          animating = false
+          return
+        }
+        requestAnimationFrame(animateAmount)
+      }
+
+      animateAmount()
+    }
 
     // If the window is loaded and money has been sent we'll display the widget
     if (!widgetAdded && [
