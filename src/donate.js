@@ -159,18 +159,16 @@ window.WebMonetizationScripts.donate = async function ({
   async function initConnection () {
     // Don't do anything if the page is hidden because web monetization won't
     // work. just wait.
-    if (document.hidden || !document.hasFocus()) {
+    if (document.hidden) {
       await new Promise(resolve => {
         function onVisible () {
-          if (!document.hidden && document.hasFocus()) {
+          if (!document.hidden) {
             resolve()
             document.removeEventListener('visibilitychange', onVisible)
-            window.removeEventListener('focus', onVisible)
           }
         }
 
         document.addEventListener('visibilitychange', onVisible, false)
-        window.addEventListener('focus', onVisible, false)
       })
     }
 
