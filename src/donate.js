@@ -31,10 +31,12 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   container.style.bottom = String(bottom) + 'px'
   container.style.left = '12px'
   container.style.zIndex = 10000
+  container.style.pointerEvents = 'none'
   // container.style.height = '32px'
   counter.style.display = 'inline-block'
   counter.style.verticalAlign = 'middle'
   counter.style.lineHeight = 'normal'
+  widget.style.pointerEvents = 'auto'
   widget.style.lineHeight = 'normal'
   widget.style.verticalAlign = 'middle'
   widget.style.display = 'inline-block'
@@ -62,11 +64,14 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   widget.onclick = ev => {
     ev.preventDefault()
     counter.style.opacity = counter.style.opacity === '0' ? '1' : '0'
+    counter.style.pointerEvents = counter.style.opacity === '1' ? 'auto' : 'none'
   }
+
   counter.onclick = ev => {
     if (counter.style.opacity === '1') {
       ev.preventDefault()
       counter.style.opacity = '0'
+      counter.style.pointerEvents = 'none'
     }
   }
 
@@ -112,6 +117,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
           requestAnimationFrame(animate)
         } else {
           counter.style.opacity = '1'
+          counter.style.pointerEvents = 'auto'
         }
       }
 
