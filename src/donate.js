@@ -47,6 +47,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   counter.style.paddingBottom = '5px'
   counter.style.paddingLeft = '14px'
   counter.style.paddingRight = '14px'
+  counter.style.boxSizing = 'border-box'
   counter.style.height = '32px'
   counter.style.borderRadius = '16px'
   counter.style.backgroundColor = '#2D333A'
