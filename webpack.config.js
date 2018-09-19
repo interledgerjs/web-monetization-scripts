@@ -6,7 +6,8 @@ module.exports = {
   mode: 'production',
 
   entry: {
-    'donate': ['@babel/polyfill', './src/donate.js']
+    'donate': ['@babel/polyfill', './src/donate.js'],
+    'paid-resources': ['@babel/polyfill', './src/paid-resources.js']
   },
 
   output: {
