@@ -254,6 +254,12 @@ window.WebMonetizationScripts.donate = async function ({
     try {
       await initConnection()
     } catch (e) {
+      // Don't retry if the user just hasn't registered a handler
+      if (e.name === 'NoHandlerRegisteredError') {
+        console.error('no web monetization handler registered.')
+        return
+      }
+
       console.error('web monetization error.' +
         'error=' + e +
         (noRetry ? '' : '. re-establishing after 1000ms.'))
