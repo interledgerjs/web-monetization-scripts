@@ -162,7 +162,7 @@ window.WebMonetizationScripts.donate = async function ({
   // TODO: cross-platform way to do this
   const ret = new EventTarget()
 
-  async function initConnection () {
+  async function initConnection (loadedSPSP) {
     // Don't do anything if the page is hidden because web monetization won't
     // work. just wait.
     if (document.hidden) {
@@ -198,10 +198,15 @@ window.WebMonetizationScripts.donate = async function ({
 
     // Create the actual connection over Interledger.
     const spspJsonResponse = await spspQuery.json()
+
     const connection = ret.connection = await window.WebMonetization.monetize({
       destinationAccount: spspJsonResponse.destination_account,
       sharedSecret: spspJsonResponse.shared_secret
     })
+
+    // Trigger loaded SPSP callback to indicate that the connection details
+    // are actually valid.
+    loadedSPSP()
 
     // Create a conceptual 'stream' of money on our Interledger connection and
     // begin sending at the maximum throughput we're allowed
@@ -250,16 +255,16 @@ window.WebMonetizationScripts.donate = async function ({
   }
 
   // Retry loop to make sure that the page continues to send money
-  async function tryConnection () {
+  async function tryConnection (loadedSPSP) {
     try {
-      await initConnection()
+      await initConnection(loadedSPSP)
     } catch (e) {
       console.error('web monetization error.' +
         'error=' + e +
         (noRetry ? '' : '. re-establishing after 1000ms.'))
       if (!noRetry) {
         await new Promise(res => setTimeout(res, 1000))
-        return tryConnection()
+        return tryConnection(loadedSPSP)
       }
     }
   }
@@ -271,6 +276,10 @@ window.WebMonetizationScripts.donate = async function ({
 
   // Return the connection details (stream, connection, money events) so that
   // the page can that information elsewhere
-  tryConnection()
-  return ret
+
+  return new Promise(resolve => {
+    // This callback ensures that the `donate` function won't resolve until an
+    // ILP connection is established for the first time
+    tryConnection(resolve.bind(null, ret))
+  })
 }
