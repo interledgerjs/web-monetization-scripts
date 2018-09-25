@@ -138,7 +138,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
 //   - noWidget: Boolean. Whether or not to show coil widget in bottom-left of
 //   page.
 //
-window.WebMonetizationScripts.donate = async function ({
+window.WebMonetizationScripts.donate = function ({
   paymentPointer,
   noRetry,
   noWidget
@@ -178,6 +178,11 @@ window.WebMonetizationScripts.donate = async function ({
       })
     }
 
+    // Make sure user hasn't closed before doing slow operation
+    if (ret._userclose) {
+      return
+    }
+
     // Convert SPSP payment pointer (e.g. $example.com) to URL (e.g.
     // https://example.com/.well-known/pay)
     const spspReceiver = window.WebMonetizationScripts
@@ -198,6 +203,11 @@ window.WebMonetizationScripts.donate = async function ({
 
     // Create the actual connection over Interledger.
     const spspJsonResponse = await spspQuery.json()
+
+    // Make sure user hasn't closed before doing slow operation
+    if (ret._userclose) {
+      return
+    }
 
     const connection = ret.connection = await window.WebMonetization.monetize({
       destinationAccount: spspJsonResponse.destination_account,
@@ -242,16 +252,33 @@ window.WebMonetizationScripts.donate = async function ({
         }
       }
 
+      function onUserClose () {
+        reject(new Error('web monetization closed by user'))
+        stream.close()
+        connection.close()
+        cleanUp()
+      }
+
       function cleanUp () {
         connection.removeEventListener('close', onClose)
         stream.removeEventListener('outgoing_money', onOutgoingMoney)
         document.removeEventListener('visibilitychange', onHide)
+        ret.removeEventListener('userclose', onUserClose)
         ret.dispatchEvent(new CustomEvent('close'))
       }
 
+      ret.addEventListener('userclose', onUserClose)
       connection.addEventListener('close', onClose)
       document.addEventListener('visibilitychange', onHide, false)
     })
+  }
+
+  // Allow user to close connection and stop retrying manually
+  ret._open = false
+  ret._userclose = false
+  ret.close = function () {
+    ret._userclose = true
+    ret.dispatchEvent(new CustomEvent('userclose'))
   }
 
   // Retry loop to make sure that the page continues to send money
@@ -262,7 +289,7 @@ window.WebMonetizationScripts.donate = async function ({
       console.error('web monetization error.' +
         'error=' + e +
         (noRetry ? '' : '. re-establishing after 1000ms.'))
-      if (!noRetry) {
+      if (!noRetry && !ret._userclose) {
         await new Promise(res => setTimeout(res, 1000))
         return tryConnection(loadedSPSP)
       }
@@ -276,10 +303,12 @@ window.WebMonetizationScripts.donate = async function ({
 
   // Return the connection details (stream, connection, money events) so that
   // the page can that information elsewhere
-
-  return new Promise(resolve => {
-    // This callback ensures that the `donate` function won't resolve until an
-    // ILP connection is established for the first time
-    tryConnection(resolve.bind(null, ret))
+  tryConnection(() => {
+    if (!ret._open) {
+      ret._open = true
+      ret.dispatchEvent(new CustomEvent('open'))
+    }
   })
+
+  return ret
 }
