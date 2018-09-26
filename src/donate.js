@@ -23,8 +23,8 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   counter.appendChild(currencyCode)
   counter.appendChild(currencyAmount)
   container.appendChild(counter) 
-  currencyCode.innerText = 'XRP '
-  currencyAmount.innerText = '0.000000'
+  currencyCode.innerText = ''
+  currencyAmount.innerText = ''
 
   let diff = 10
   let bottom = -40
@@ -80,6 +80,8 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   let animating = false
   let display = 0
   let sum = 0
+  let scale = 6
+  let displayScale = 6
 
   donation.addEventListener('money', ev => {
     sum += Number(ev.detail.amount)
@@ -88,8 +90,9 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
       animating = true
 
       function animateAmount () {
-        display += 4000
-        currencyAmount.innerText = (Math.min(display, sum) / 1e9).toFixed(6)
+        display += ((sum - display) / 20)
+        currencyAmount.innerText = (Math.min(display, sum) / Math.pow(10, scale))
+          .toFixed(displayScale)
 
         if (display >= sum) {
           animating = false
@@ -107,6 +110,18 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
       'interactive',
       'complete'
     ].includes(document.readyState)) {
+      // set currency details now that an Interledger connection exists
+      currencyCode.innerText = (donation.stream.sourceAssetCode || 'XRP') + ' '
+      scale = donation.stream.sourceAssetScale || 6
+      displayScale = scale
+
+      // special case for displaying XRP in drops (uXRP) instead of drips (nXRP)
+      if (donation.stream.sourceAssetCode === 'XRP' && scale === 9) {
+        displayScale = 6
+      }
+
+      currencyAmount.innerText = (0).toFixed(displayScale)
+
       widgetAdded = true
       document.body.appendChild(container)
 
