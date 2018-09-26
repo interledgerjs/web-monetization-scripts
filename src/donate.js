@@ -80,6 +80,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
   let animating = false
   let display = 0
   let sum = 0
+  let currency = 'XRP'
   let scale = 6
   let displayScale = 6
 
@@ -111,15 +112,16 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
       'complete'
     ].includes(document.readyState)) {
       // set currency details now that an Interledger connection exists
-      currencyCode.innerText = (donation.stream.sourceAssetCode || 'XRP') + ' '
-      scale = donation.stream.sourceAssetScale || 6
+      currency = donation.connection.sourceAssetCode || 'XRP'
+      scale = donation.connection.sourceAssetScale || 9
       displayScale = scale
 
       // special case for displaying XRP in drops (uXRP) instead of drips (nXRP)
-      if (donation.stream.sourceAssetCode === 'XRP' && scale === 9) {
+      if (currency === 'XRP' && scale === 9) {
         displayScale = 6
       }
 
+      currencyCode.innerText =  currency + ' '
       currencyAmount.innerText = (0).toFixed(displayScale)
 
       widgetAdded = true
