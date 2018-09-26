@@ -91,7 +91,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
       animating = true
 
       function animateAmount () {
-        display += ((sum - display) / 20)
+        display += Math.ceil((sum - display) / 20)
         currencyAmount.innerText = (Math.min(display, sum) / Math.pow(10, scale))
           .toFixed(displayScale)
 
