@@ -1,3 +1,5 @@
+const debug = require('debug')('web-monetization-scripts:donate')
+
 window.WebMonetizationScripts = window.WebMonetizationScripts || {}
 window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
   if (!paymentPointer.startsWith('$')) {
@@ -327,11 +329,11 @@ window.WebMonetizationScripts.donate = function ({
     } catch (e) {
       // Don't retry if the user just hasn't registered a handler
       if (e.name === 'NoHandlerRegisteredError') {
-        console.error('no web monetization handler registered.')
+        debug('no web monetization handler registered.')
         return
       }
 
-      console.error('web monetization error.' +
+      debug('web monetization error.' +
         'error=' + e +
         (noRetry ? '' : '. re-establishing after 1000ms.'))
       if (!noRetry && !ret._userclose) {
