@@ -23,6 +23,7 @@
     "@babel/preset-env": "^7.0.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-transform-runtime": "^6.23.0",
+    "debug": "^4.0.1",
     "fs-extra": "^7.0.0",
     "webpack": "^4.17.1",
     "webpack-bundle-analyzer": "^2.13.1",
