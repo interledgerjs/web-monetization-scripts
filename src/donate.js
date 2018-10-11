@@ -1,13 +1,14 @@
 const debug = require('debug')('web-monetization-scripts:donate')
 
 window.WebMonetizationScripts = window.WebMonetizationScripts || {}
-window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
+window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer, withSession) {
   if (!paymentPointer.startsWith('$')) {
     return paymentPointer
   }
 
+  const sessionId = withSession ? '/' + Array.apply(null, Array(3)).map(() => { return Math.random().toString(36).substr(2, 9) }).join('') : ''
   const parsed = new URL('https://' + paymentPointer.substring(1))
-  return parsed.origin + (parsed.pathname || '/.well-known/pay')
+  return parsed.origin + (parsed.pathname ? parsed.pathname + sessionId : sessionId + '/.well-known/pay').replace(/\/+/g, '/')
 }
 
 window.WebMonetizationScripts.createDonateWidget = function (donation) {
@@ -173,10 +174,14 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
 //   - noWidget: Boolean. Whether or not to show coil widget in bottom-left of
 //   page.
 //
+//   - withSession: Boolean. Whether or not to append a random session id to
+//   the payment pointer (to distinct all donations for all streams)
+//
 window.WebMonetizationScripts.donate = function ({
   paymentPointer,
   noRetry,
-  noWidget
+  noWidget,
+  withSession
 }) {
   function wmError (msg) {
     throw new Error(msg + ' make sure you include the polyfill from https://polyfill.webmonetization.org/polyfill.js and include it before this script.')
@@ -221,7 +226,7 @@ window.WebMonetizationScripts.donate = function ({
     // Convert SPSP payment pointer (e.g. $example.com) to URL (e.g.
     // https://example.com/.well-known/pay)
     const spspReceiver = window.WebMonetizationScripts
-      .paymentPointerToUrl(paymentPointer)
+      .paymentPointerToUrl(paymentPointer, withSession)
 
     // Actual SPSP query that retrieves details of how to stream payment over
     // Interledger
