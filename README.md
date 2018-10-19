@@ -40,6 +40,6 @@ window.WebMonetizationScripts.donate({
 
 #### Return Value
 
-- `ret: Promise<EventTarget>` - Listen for `money` to get a notification when a packet of money has been sent (`ev.detail.amount` has the exact amount). Listen for `close` to get a notification whenever the connection drops.
+- `ret: EventTarget` - Listen for `money` to get a notification when a packet of money has been sent (`ev.detail.amount` has the exact amount). Listen for `close` to get a notification whenever the connection drops.
 - `ret.connection: WebConnection` - [Web Monetization Connection](https://github.com/interledger/rfcs/blob/master/0028-web-monetization/0028-web-monetization.md#ilp-connection-class) currently used by the donation.
 - `ret.stream: WebStream` - [Web Monetization Stream](https://github.com/interledger/rfcs/blob/master/0028-web-monetization/0028-web-monetization.md#ilp-stream-class) currently used by the donation.
