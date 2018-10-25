@@ -27,7 +27,8 @@ Example of usage at [`examples/donate.html`](https://github.com/interledgerjs/we
 window.WebMonetizationScripts.donate({
   paymentPointer: '$twitter.xrptipbot.com/sharafian_',
   noRetry: false,
-  noWidget: false
+  noWidget: false,
+  withSession: false
 })
 ```
 
@@ -37,6 +38,7 @@ window.WebMonetizationScripts.donate({
 - `opts.paymentPointer: String` - Required. [Payment pointer](https://github.com/interledger/rfcs/blob/master/0026-payment-pointers/0026-payment-pointers.md) to receive donations.
 - `opts.noRetry: Boolean` - Optional, default `false`. If `noRetry` is set then the ILP connection will not be re-established when it goes down. You can manually re-establish it by calling `donate` again.
 - `opts.noWidget: Boolean` - Optional, default `false`. If `noWidget` is set then no Coil logo will appear in the bottom left of the screen when payment occurs.
+- `opts.withSession: Boolean` - Optional, default `false`. If `withSession` is set then a random session id (string) will be appended to the payment pointer, to allow the receiver to track all donations (all streams) for a specific visit. Sample: `$twitter.xrptipbot.com/Coil` will become `$twitter.xrptipbot.com/Coil/m9tvbogbi457gsj00o4y70zobqj`.
 
 #### Return Value
 
