@@ -10,9 +10,10 @@ window.WebMonetizationScripts.paymentPointerToUrl = function (paymentPointer) {
   return parsed.origin + (parsed.pathname || '/.well-known/pay')
 }
 window.WebMonetizationScripts.css = `
-  #wm-coil-advert-widget {
+  #wm-coil-advert-widget, #wm-coil-donate-widget {
     position: fixed;
     z-index: 10000;
+    left: 12px;
   }
 
   #wm-widget {
@@ -27,6 +28,7 @@ window.WebMonetizationScripts.css = `
 
   }
   #wm-widget-text {
+    display: inline-block;
     vertical-align: middle;
     line-height: normal;
     margin-left: 4px;
@@ -47,6 +49,7 @@ window.WebMonetizationScripts.css = `
 
   #wm-link, #wm-link:hover, #wm-link:active {
     color: white;
+    text-decoration: underline;
   }
 `
 
@@ -112,7 +115,7 @@ window.WebMonetizationScripts.createAdvertWidget = function () {
 
 window.WebMonetizationScripts.createDonateWidget = function (donation) {
   const container = document.createElement('div')
-  container.id = 'web-monetization-widget'
+  container.id = 'wm-coil-donate-widget'
 
   const style = document.createElement('style')
 
