@@ -213,7 +213,8 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
       displayScale = scale
 
       // special case for displaying XRP in drops (uXRP) instead of drips (nXRP)
-      if (currency === 'XRP' && scale === 9) {
+      // also shows USD@9 as USD@6
+      if ((currency === 'XRP' || currency === 'USD') && scale === 9) {
         displayScale = 6
       }
 
