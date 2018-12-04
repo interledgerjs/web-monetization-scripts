@@ -92,11 +92,13 @@ window.WebMonetizationScripts.createAdvertWidget = function () {
 
   widget.onclick = () => {
     advertText.style.opacity = advertText.style.opacity === '0' ? '1' : '0'
+    advertText.style.display = advertText.style.display === 'none' ? 'initial' : 'none'
   }
 
   advertText.onclick = ev => {
     if (ev.target.id === 'wm-link') {
       advertText.style.opacity = advertText.style.opacity === '0' ? '1' : '0'
+      advertText.style.display = advertText.style.display === 'none' ? 'initial' : 'none'
     }
   }
   function animate () {
@@ -107,6 +109,7 @@ window.WebMonetizationScripts.createAdvertWidget = function () {
       requestAnimationFrame(animate)
     } else {
       advertText.style.opacity = '1'
+      advertText.style.display = 'initial'
     }
   }
 
@@ -239,6 +242,7 @@ window.WebMonetizationScripts.createDonateWidget = function (donation) {
         } else {
           counter.style.opacity = '1'
           counter.style.pointerEvents = 'auto'
+          counter.style.display = 'initial'
         }
       }
 
