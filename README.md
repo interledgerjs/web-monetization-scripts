@@ -1,6 +1,43 @@
 # Web Monetization Scripts
 > Client-side scripts to Web Monetize sites
 
+## Counter
+
+### Description
+
+Shows a counter of how much has been donated to the page. This is compatible
+with the new `<meta>` tag based version of Web Monetization.
+
+### Including the Script
+
+Make sure you have included the Web Monetization `<meta>` tag in your page.
+Pasting the following code into your page will add a counter to the bottom left
+of the page:
+
+```html
+<script src="https://cdn.coil.com/counter.js"></script>
+<script>
+  window.WebMonetizationScripts.createCounter()
+</script>
+```
+
+### Usage
+
+This will hook into the existing web monetization events, so there are no
+parameters required.
+
+```
+window.WebMonetizationScripts.createCounter()
+```
+
+#### Parameters
+
+None.
+
+#### Return Value
+
+None.
+
 ## Donate
 
 ### Description
