@@ -1,6 +1,69 @@
 # Web Monetization Scripts
 > Client-side scripts to Web Monetize sites
 
+## Conditionals
+
+### Description
+
+Sometimes you want to show/hide your content based on whether the viewer is
+Web-Monetized. These scripts provide a really simple way to do that on the
+client side.
+
+The idea is that everyone should be able to do this on their site/blog!
+
+**Keep in mind that all of your html is still sent to the client, so a tricky
+user could bypass this without actually having Web Monetization!** In the
+future, there will be better support for secure Web Monetized content.
+
+These conditional scripts will work anywhere that HTML with script tags can be used!
+
+If you're using react for your site, it is _highly_ recommended that you use
+[React Web Monetization](https://github.com/sharafian/react-web-monetization)
+instead.
+
+### Including the Script
+
+For all of these snippets, make sure you have included the Web Monetization
+`<meta>` tag in your page.
+
+#### Show an Element if the User is Web Monetized
+
+Put this code where you want your element to appear. It will be invisible
+(`visibility: hidden`) until Web Monetization starts. It will never appear is
+Web Monetization is not enabled.
+
+It's important to keep the `<div>` wrapped around the code in exactly the way
+it's done below (including style)! The `<script>` MUST be the first thing
+inside of the div for this to work. Everything after the `<script>` inside of
+the `<div>` is displayed conditionally.
+
+```html
+<div style="visibilty:hidden;">
+  <script src="https://cdn.coil.com/if-monetized.js"></script>
+  <!-- you can put whatever code you want after the script tag -->
+  <p>Monetization is enabled!</p>
+</div>
+```
+
+#### Show an Element if the User is Not Web Monetized
+
+Put this code where you want your element to appear. If the browser does not
+support Web Monetization, it will appear immediately. If the browser supports
+Web Monetization but is not paying, it will appear after a couple of seconds.
+
+It's important to keep the `<div>` wrapped around the code in exactly the way
+it's done below (including style)! The `<script>` MUST be the first thing
+inside of the div for this to work. Everything after the `<script>` inside of
+the `<div>` is displayed conditionally.
+
+```html
+  <div style="visibilty:hidden;">
+    <script src="https://cdn.coil.com/if-not-monetized.js"></script>
+    <!-- you can put whatever code you want after the script tag -->
+    <p>Monetization is not enabled!</p>
+  </div>
+```
+
 ## Counter
 
 ### Description

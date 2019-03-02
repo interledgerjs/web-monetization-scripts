@@ -7,7 +7,9 @@ module.exports = {
 
   entry: {
     'donate': ['@babel/polyfill', './src/donate.js'],
-    'counter': ['./src/counter.js']
+    'counter': ['./src/counter.js'],
+    'if-monetized': ['./src/if-monetized.js'],
+    'if-not-monetized': ['./src/if-not-monetized.js']
   },
 
   output: {
