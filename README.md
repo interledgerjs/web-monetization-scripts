@@ -101,9 +101,14 @@ None.
 
 None.
 
-## Donate
+## Donate (DEPRECATED)
 
 ### Description
+
+**This script has been deprecated, because it uses the old polyfill-based
+version of Web Monetization.  If you want to send money to a payment pointer,
+you can use the new `<meta>` tag flow [described
+here](https://medium.com/interledger-blog/simplifying-web-monetization-871aee326170)**
 
 The donate script is used for a page that's supported through donations in the
 background. It shows the user a coil logo when payment is being sent, and if
