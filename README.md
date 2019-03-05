@@ -38,7 +38,7 @@ inside of the div for this to work. Everything after the `<script>` inside of
 the `<div>` is displayed conditionally.
 
 ```html
-<div style="visibilty:hidden;">
+<div style="display:none;">
   <script src="https://cdn.coil.com/if-monetized.js"></script>
   <!-- you can put whatever code you want after the script tag -->
   <p>Monetization is enabled!</p>
@@ -57,7 +57,7 @@ inside of the div for this to work. Everything after the `<script>` inside of
 the `<div>` is displayed conditionally.
 
 ```html
-  <div style="visibilty:hidden;">
+  <div style="display:none;">
     <script src="https://cdn.coil.com/if-not-monetized.js"></script>
     <!-- you can put whatever code you want after the script tag -->
     <p>Monetization is not enabled!</p>
