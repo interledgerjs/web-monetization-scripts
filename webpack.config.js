@@ -9,7 +9,8 @@ module.exports = {
     'donate': ['@babel/polyfill', './src/donate.js'],
     'counter': ['./src/counter.js'],
     'if-monetized': ['./src/if-monetized.js'],
-    'if-not-monetized': ['./src/if-not-monetized.js']
+    'if-not-monetized': ['./src/if-not-monetized.js'],
+    'monetized-classes': ['./src/monetized-classes.js']
   },
 
   output: {

@@ -64,6 +64,32 @@ the `<div>` is displayed conditionally.
   </div>
 ```
 
+#### Show Many Elements Depending on Monetization
+
+The scripts above can be inefficient if you have a lot of elements that depend on
+monetization. In the situation where you want to show/hide lots of elements,
+you can use the `monetized-classes` script.
+
+Put the following code **in the `<head>` of your page.**
+
+```html
+  <script defer src="cdn.coil.com/monetized-classes.js"></script>
+  <style id="wm-stylesheet">
+    .wm-if-monetized { display: none; }
+    .wm-if-not-monetized { display: none; }
+  </style>
+```
+
+Now, wherever you want to use Web Monetization conditionals you can just
+use the `wm-if-monetized` and `wm-if-not-monetized` classes.
+
+Example:
+
+```html
+  <p class="wm-if-monetized">Monetization is enabled!</p>
+  <p class="wm-if-not-monetized">Monetization is not enabled!</p>
+```
+
 ## Counter
 
 ### Description
